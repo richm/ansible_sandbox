@@ -6,8 +6,10 @@
 
 - name: include othertasks.yml from role
   include_role:
-    name: handler_test
+    name: "{{ role_path ~ '../../..' if role_path is defined else 'handler_test' }}"
     tasks_from: othertasks.yml
+  vars:
+    __calling_from: mytasks
 
 - name: end handler_test mytasks
   debug:

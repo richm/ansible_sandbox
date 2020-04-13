@@ -7,6 +7,9 @@
 - name: include mytasks.yml
   include_tasks: mytasks.yml
 
+- name: include mytasks2.yml
+  include_tasks: mytasks2.yml
+
 - name: end handler_test main
   debug:
     msg: last task in handler_test main

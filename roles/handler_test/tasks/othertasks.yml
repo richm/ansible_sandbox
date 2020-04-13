@@ -1,11 +1,11 @@
 - name: begin handler_test othertasks
   debug:
-    msg: first task in handler_test othertasks
+    msg: calling from {{ __calling_from }}
   notify: calling handler
   changed_when: true
 
 - name: end handler_test othertasks
   debug:
-    msg: last task in handler_test othertasks
+    msg: calling from {{ __calling_from }}
   notify: calling handler
   changed_when: true
