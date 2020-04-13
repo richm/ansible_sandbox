@@ -1,0 +1,14 @@
+- name: begin handler_test main
+  debug:
+    msg: first task in handler_test main
+  notify: calling handler
+  changed_when: true
+
+- name: include mytasks.yml
+  include_tasks: mytasks.yml
+
+- name: end handler_test main
+  debug:
+    msg: last task in handler_test main
+  notify: calling handler
+  changed_when: true

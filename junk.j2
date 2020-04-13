@@ -1,0 +1,3 @@
+{% for output in logging_outputs | items2dict(key_name='type', value_name='name') %}
+call {{ output }}
+{% endfor %}

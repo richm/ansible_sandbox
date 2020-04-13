@@ -1,0 +1,22 @@
+---
+- name: test task 1
+  hosts: localhost
+  handlers:
+    - name: calling handler
+      debug:
+        msg: called handler
+  roles:
+    - handler_test
+  tasks:
+    - name: first task in test
+      debug:
+        msg: first task in test
+      notify: calling handler
+      changed_when: true
+    - name: include handler_test tasks
+      include_tasks: roles/handler_test/tasks/main.yml
+    - name: last task in test
+      debug:
+        msg: last task in test
+      notify: calling handler
+      changed_when: true

@@ -1,0 +1,88 @@
+---
+- name: set parameters for test
+  hosts: localhost
+  tasks:
+  - set_fact:
+      astring: "astring"
+  - set_fact:
+      alist: ["this","is","a","list"]
+  - debug:
+      msg: astring is a string
+    when: astring is string
+  - debug:
+      msg: astring is not a string
+    when: astring is not string
+  - debug:
+      msg: astring is iterable
+    when: astring is iterable
+  - debug:
+      msg: astring is a sequence
+    when: astring is sequence
+  - debug:
+      msg: astring is not a sequence
+    when: astring is not sequence
+  - debug:
+      msg: alist is a string
+    when: alist is string
+  - debug:
+      msg: alist is not a string
+    when: alist is not string
+  - debug:
+      msg: alist is a sequence
+    when: alist is sequence
+  - debug:
+      msg: alist is not a sequence
+    when: alist is not sequence
+  - debug:
+      msg: alist is iterable
+    when: alist is iterable
+  - set_fact:
+      logging_outputs:
+      - name: name-files-foo
+        type: files
+      - name: name-files-bar
+        type: files
+      - name: name-fwd-foo
+        type: fwd
+      - name: name-fwd-bar
+        type: fwd
+
+  - debug:
+      msg: "uniquelist = {{ logging_outputs | items2dict(key_name='type', value_name='name') }}"
+
+  - template:
+      src: junk.j2
+      dest: junk.rsyslog
+ 
+  - set_fact:
+      emptydict: {}
+
+  - set_fact:
+      junkdict: {'foo':'bar'}
+
+  - debug:
+      msg: thereherehere
+    when: junkstr|bool
+
+  - debug:
+      msg: hereherehere
+    when: junkdict|d()
+
+  - package:
+      name: screen
+      state: present
+
+  - set_fact:
+      junkb64: a2VybmVsX3NldHRpbmdzIHZpcnR1YWwtZ3Vlc3QK
+
+  - set_fact:
+      junk: kernel_settings
+
+  - name: junk
+    set_fact:
+      junkmsg: here
+    when: junk is match('kernel_settings')
+
+  - debug:
+      msg: "{{ junkmsg }}"
+    when: junkmsg is defined
