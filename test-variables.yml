@@ -1,0 +1,30 @@
+---
+- name: set parameters for test
+  hosts: localhost
+  tasks:
+  - set_fact:
+      astring: "astringval"
+  - set_fact:
+      bstring: "bstringval"
+  - debug:
+      msg: "{{ item }} is defined"
+    loop:
+      - astring
+      - bstring
+      - cstring
+  - set_fact:
+      multiline:
+        - "this\
+          is\
+          multiline"
+  - debug:
+      msg: multiline {{ multiline[0] }}
+  - assert:
+      that: >-
+        {{ item }}
+        is
+        defined
+    loop:
+      - astring
+      - bstring
+      - cstring

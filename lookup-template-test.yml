@@ -1,0 +1,10 @@
+---
+- name: set parameters for test
+  hosts: localhost
+  vars:
+    output_conf_var: output_conf_value
+  tasks:
+  - set_fact:
+      output_conf: "{{ lookup('template','output_conf.j2') }}"
+  - debug:
+      msg: this is the output_conf - {{ output_conf }}

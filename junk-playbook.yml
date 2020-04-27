@@ -2,6 +2,8 @@
 - name: set parameters for test
   hosts: localhost
   tasks:
+  - debug:
+      msg: path is {{ '/1/2/3/4/5/6/7/8' | dirname | dirname | dirname ~ '/rsyslog' }}
   - set_fact:
       astring: "astring"
   - set_fact:

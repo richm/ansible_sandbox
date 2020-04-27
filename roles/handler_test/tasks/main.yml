@@ -1,17 +1,23 @@
-- name: begin handler_test main
+- name: begin handler_test main role
   debug:
-    msg: first task in handler_test main
+    msg: first task in handler_test main role
   notify: calling handler
   changed_when: true
 
-- name: include mytasks.yml
-  include_tasks: mytasks.yml
+- name: subrole1
+  include_role:
+    name: "{{ role_path }}/roles/subrole1"
+  vars:
+    __myvar: main1
 
-- name: include mytasks2.yml
-  include_tasks: mytasks2.yml
+- name: subrole2
+  include_role:
+    name: "{{ role_path }}/roles/subrole1"
+  vars:
+    __myvar: main2
 
-- name: end handler_test main
+- name: end handler_test main role
   debug:
-    msg: last task in handler_test main
+    msg: last task in handler_test main role
   notify: calling handler
   changed_when: true

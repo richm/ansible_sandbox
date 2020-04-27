@@ -1,0 +1,84 @@
+---
+- name: set parameters for test
+  hosts: localhost
+  vars:
+    logging_outputs:
+      - name: output_role_name0
+        type: output_type0
+      - name: output_role_name1
+        type: output_type1
+      - name: output_role_name2
+        type: output_type0
+      - name: output_role_name3
+        type: output_type1
+    logging_inputs:
+      - name: input_role_nameA
+        type: input_typeA
+      - name: input_role_nameB
+        type: input_typeB
+      - name: input_role_nameC
+        type: input_typeB
+      - name: input_role_nameD
+        type: input_typeB
+    logging_flows:
+      - name: flow_nameX
+        inputs: [input_role_nameA]
+        outputs: [output_role_name0, output_role_name1]
+      - name: flow_nameY
+        inputs: [input_role_nameB]
+        outputs: [output_role_name1]
+      - name: flow_nameZ
+        inputs: [input_role_nameA,input_role_nameB,input_role_nameC,input_role_nameD]
+        outputs: [output_role_name2,output_role_name3]
+    __logging_rsyslog_input_conditions:
+      # e.g. for imjournal
+      input_typeA: '($inputname == "input_typeA")'
+      # e.g. for imfile - assumes this will be expanded inside a loop
+      # where the loop variable is called 'input' and the value is
+      # one of the 'logging_inputs'
+      input_typeB: '($syslogtag == "{{ input.name }}")'
+  tasks:
+    - set_fact:
+        type0_outputs: "{{ logging_outputs | selectattr('foo','defined') | selectattr('foo','==','output_type0') | selectattr('bar','defined') | list }}"
+    - debug:
+        msg: type0_outputs is {{ type0_outputs }}
+    - debug:
+        msg: |
+          before
+          {% set def_out = {'name':'foo','type':'bar'} %}
+          {% set rsyslog_outputs = logging_outputs | d([]) %}
+          {% if not logging_outputs|selectattr("type","eq","files")|list %}
+          {%   set rsyslog_outputs = rsyslog_outputs + [{'name':'foo','asdfasdf':'bar'}] %}
+          here
+          {% endif %}
+          {% for elem in rsyslog_outputs | selectattr("asdfasdf","defined") %}
+            elem {{ elem }}
+          {% endfor %}
+          rsyslog_outputs = {{ rsyslog_outputs }}
+          {% set outdict = {} %}
+          {% for flow in logging_flows %}
+          {%   for oname in flow.outputs %}
+          {%     set _ = outdict.__setitem__(oname, outdict.get(oname,[])|union(flow.inputs)) %}
+          {%   endfor %}
+          {% endfor %}
+          {% set indict = {} %}
+          {% for input in logging_inputs %}
+          {%   set _ = indict.__setitem__(input.name, input) %}
+          {% endfor %}
+          {% for output in logging_outputs %}
+          if 
+          {%   for inputname in outdict[output.name] %}
+          {%     if not loop.first %}
+            or
+          {%     endif %}
+          {%     set input = indict[inputname] %}
+          {%     if input.type == "input_typeA" %}
+            ($inputname == "input_typeA")
+          {%     elif input.type == "input_typeB" %}
+            ($syslogtag == "{{ input.name }}")
+          {%     endif %}
+          {%   endfor %}
+            then {
+              call {{ output.name }}
+          }
+          {% endfor %}
