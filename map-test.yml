@@ -1,0 +1,33 @@
+---
+- name: test role var inclusion
+  hosts: localhost
+  tasks:
+    - debug:
+        msg: facts {{ ansible_facts }}
+
+    - set_fact:
+        __certificate_provider_default: certmonger
+        certificate_requests:
+          - name: mycert
+            dns: www.example.com
+            ca: self-sign
+          - name: yourcert
+            dns: y.example.com
+            ca: self-sign
+          - name: ccert
+            provider: another
+          - name: dcert
+            provider: another
+          - name: ecert
+            provider: certmonger
+
+    - name: Install and configure required providers
+      set_fact:
+        providers: |
+          {% set ns = namespace(unique_providers=[]) %}
+          {% for item in certificate_requests %}
+          {%   set _ = ns.unique_providers.append(item.provider | d(__certificate_provider_default)) %}
+          {% endfor %}
+          {{ ns.unique_providers | unique }}
+    - debug:
+        msg: unique providers {{ providers }}

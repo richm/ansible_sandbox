@@ -1,0 +1,7 @@
+- name: change role - change something
+  command: ls
+  register: ls_output
+
+- name: change role - do not change anything
+  command: ls
+  changed_when: false

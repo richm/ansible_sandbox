@@ -1,0 +1,25 @@
+---
+- name: changed test
+  hosts: localhost
+  tasks:
+    - debug:
+        msg: facts 1 {{ ansible_facts }}
+
+    - command: ls
+
+    - debug:
+        msg: facts 2 {{ ansible_facts }}
+ 
+    - command: ls
+      changed_when: false
+
+    - debug:
+        msg: facts 2 {{ ansible_facts }}
+
+    - include_role:
+        name: change_test
+      register: change_test_role_result
+
+    - debug:
+        msg: result {{ change_test_role_result }}
+

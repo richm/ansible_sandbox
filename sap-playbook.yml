@@ -1,0 +1,52 @@
+- name: junk
+  hosts: localhost
+  tasks:
+    - set_fact:
+        mypkgs:
+          - [ 'kernel' , '5.6.13-201.fc31' ]
+          - [ 'glibc' , '2.30-12.fc31' ]
+          - [ 'openssl' , '1.1.1g-2.fc31' ]
+        listA:
+          - alpha
+          - beta
+          - gamma
+        listB:
+          - gamma
+          - epsilon
+          - phi
+
+    - name: list1
+      debug:
+        msg: |
+          diff1 = {{ listA | difference(listB) }}
+          diff2 = {{ listB | difference(listA) }}
+          diff3 = {{ 'string' | difference(listA) }}
+          diff4 = {{ listA | difference('string') }}
+
+    # - name: Gather package facts
+    #   package_facts:
+
+    # - debug:
+    #     msg: facts {{ ansible_facts.packages }}
+
+    # - set_fact:
+    #     pkgs_to_install_update: |-
+    #       {% set ns = namespace() %}
+    #       {% set ns.pkgs = [] %}
+    #       {% for mypkg in mypkgs %}
+    #       {%   if not mypkg[0] in ansible_facts.packages %}
+    #       {%     set _ = ns.pkgs.append(mypkg | join('-')) %}
+    #       {%   else %}
+    #       {%     set pkg = ansible_facts.packages[mypkg[0]][-1] %}
+    #       {%     set verrel = pkg.version ~ '-' ~ pkg.release %}
+    #       {%     if mypkg[1] is version(verrel, operator='gt') %}
+    #       {%       set _ = ns.pkgs.append(mypkg | join('-')) %}
+    #       {%     else %}
+    #       {%       set _ = "pkg already installed with same or later version" %}
+    #       {%     endif %}
+    #       {%   endif %}
+    #       {% endfor %}
+    #       {{ ns.pkgs }}
+
+    # - debug:
+    #     msg: pkgs_to_install_update {{ pkgs_to_install_update }}

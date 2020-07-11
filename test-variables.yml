@@ -3,9 +3,64 @@
   hosts: localhost
   tasks:
   - set_fact:
+      kernel_settings_systemd_cpu_affinity: null
+      kernel_settings_systemd_cpu_affinity_state: null
+
+  - debug:
+      msg: "{{ 'cpu_affinity'
+               if kernel_settings_systemd_cpu_affinity
+               or kernel_settings_systemd_cpu_affinity_state
+               else omit }}"
+  - debug:
+      msg: "{{ kernel_settings_systemd_cpu_affinity |
+               default(omit, true) }}"
+  - debug:
+      msg: "{{ kernel_settings_systemd_cpu_affinity_state |
+               default(omit, true) }}"
+
+  - set_fact:
+      myvar: true
+    when: not_defined | d(false)
+
+  - debug:
+      msg: myvar is {{ myvar | d('not defined') }}
+
+  - set_fact:
+      kernel_settings_sysctl:
+        - name: foo
+        - previous: replaced
+
+  - debug:
+      msg: here
+    when:
+      - kernel_settings_sysctl.state | d() == 'empty'
+        or kernel_settings_sysctl | selectattr('previous', 'defined') |
+           selectattr('previous', '==', 'replaced') | list
+
+  - debug:
+      msg: here {{ item.name }}
+    loop: "{{ kernel_settings_sysctl if kernel_settings_sysctl.0 is defined else [] }}"
+    when:
+      - kernel_settings_sysctl | d([])
+      - kernel_settings_sysctl.state | d() != 'empty'
+      - item.previous is not defined
+
+  - fail:
+      msg: there
+
+  - set_fact:
+      emptystring: ""
+  - debug:
+      msg: emptystring is empty
+    when: not emptystring
+
+  - set_fact:
       astring: "astringval"
   - set_fact:
       bstring: "bstringval"
+  - debug:
+      msg: should be a dict value {{ item }}
+    when: notdefined | d()
   - debug:
       msg: "{{ item }} is defined"
     loop:

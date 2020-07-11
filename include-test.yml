@@ -1,0 +1,16 @@
+---
+- name: set parameters for test
+  hosts: localhost
+  tasks:
+    - name: Perform platform/version specific tasks
+      include_tasks: "{{ item }}"
+      loop: "{{ q('first_found', __rolename_setup_files, errors='ignore') }}"
+      vars:
+        __rolename_setup_files:
+          files:
+            - "setup_{{ ansible_distribution }}_{{ ansible_distribution_version }}.yml"
+            - "setup_{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+            - "setup_{{ ansible_distribution }}.yml"
+            - "setup_{{ ansible_os_family }}.yml"
+          paths:
+            - tasks

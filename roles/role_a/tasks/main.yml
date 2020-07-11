@@ -1,0 +1,51 @@
+---
+- name: in role_a tasks/main.yml
+  debug:
+    msg: in role_a tasks/main.yml
+
+- name: Set version-specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}_{{ ansible_distribution_version }}.yml"
+        - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+        - "default.yml"
+#      paths: "{{ role_path }}/vars"
+#      skip: true
+
+- name: show ansible_search_path before
+  debug:
+    msg: ansible_search_path before {{ ansible_search_path }}
+
+- name: include role_b
+  include_role:
+    name: role_b
+
+- name: show ansible_search_path after
+  debug:
+    msg: ansible_search_path after {{ ansible_search_path }}
+
+    # params:
+    #   files:
+    #     - "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+    #     - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    #     - "{{ ansible_distribution }}.yml"
+    #     - "{{ ansible_os_family }}.yml"
+    #     - "default.yml"
+    #   skip: true
+      
+#    - files:
+      #   - "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+      #   - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+      #   - "{{ ansible_distribution }}.yml"
+      #   - "{{ ansible_os_family }}.yml"
+      #   - "default.yml"
+      # paths: "{{ role_path }}/vars"
+    # params: {files: ["{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml",
+    #                  "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml",
+    #                  "{{ ansible_distribution }}.yml",
+    #                  "{{ ansible_os_family }}.yml",
+    #                  "default.yml"],
+    #          skip: true}

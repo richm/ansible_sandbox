@@ -1,0 +1,8 @@
+ansible-playbook 2.9.6
+  config file = /etc/ansible/ansible.cfg
+  configured module search path = ['/home/rmeggins/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /home/rmeggins/ansible_sandbox/.venv/lib64/python3.7/site-packages/ansible
+  executable location = /home/rmeggins/ansible_sandbox/.venv/bin/ansible-playbook
+  python version = 3.7.6 (default, Jan 30 2020, 09:44:41) [GCC 9.2.1 20190827 (Red Hat 9.2.1-1)]
+Using /etc/ansible/ansible.cfg as config file
+ERROR! the playbook: handler-test.yml could not be found

@@ -1,0 +1,5 @@
+---
+- name: test role var inclusion
+  hosts: localhost
+  roles:
+    - role_a

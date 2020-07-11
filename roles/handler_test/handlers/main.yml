@@ -1,0 +1,3 @@
+- name: calling handler
+  debug:
+    msg: called handler

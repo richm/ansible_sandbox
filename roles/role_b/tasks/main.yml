@@ -1,0 +1,39 @@
+---
+- name: in role_b tasks/main.yml
+  debug:
+    msg: in role_b tasks/main.yml
+
+- name: show ansible_search_path in role_b
+  debug:
+    msg: ansible_search_path role_b {{ ansible_search_path }}
+
+# - name: Set version-specific variables
+#   include_vars: "{{ item }}"
+#   with_first_found:
+#     - files:
+#         - no_such_file.yml
+#       paths: "{{ role_path }}/vars"
+#       skip: true
+
+        # - "{{ ansible_distribution }}_{{ ansible_distribution_version }}.yml"
+        # - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+        # - "{{ ansible_distribution }}.yml"
+        # - "{{ ansible_os_family }}.yml"
+        # - "default.yml"
+
+- name: Set version-specific variables
+  include_vars: "{{ item }}"
+  loop: "{{ lookup('first_found', myloopparam) }}"
+  vars:
+    myloopparam:
+      files:
+        - no_such_file.yml
+      paths: "{{ role_path }}/vars"
+      skip: true
+
+- name: Set version-specific variables
+  include_vars: Fedora_31.yml
+
+- name: see if loop var is set
+  debug:
+    msg: myloopparam is {{ myloopparam | d('undefined') }}

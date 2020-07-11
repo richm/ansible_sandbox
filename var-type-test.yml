@@ -1,0 +1,61 @@
+---
+- name: changed test
+  hosts: localhost
+  tasks:
+    - set_fact:
+        strvar: this_is_a_string
+        listvar:
+          - this
+          - is
+          - a
+          - list
+        dictvar:
+          this: is
+          a: dict
+        intvar: 1
+        boolvar: true
+
+    - debug:
+        msg: strvar is string
+      when: strvar is string
+
+    - debug:
+        msg: strvar is iterable
+      when: strvar is iterable
+
+    - debug:
+        msg: strvar is sequence
+      when: strvar is sequence
+
+    - debug:
+        msg: listvar is string
+      when: listvar is string
+
+    - debug:
+        msg: listvar is iterable
+      when: listvar is iterable
+
+    - debug:
+        msg: listvar is sequence
+      when: listvar is sequence
+
+    - debug:
+        msg: dictvar is string
+      when: dictvar is string
+
+    - debug:
+        msg: dictvar is iterable
+      when: dictvar is iterable
+
+    - debug:
+        msg: dictvar is sequence
+      when: dictvar is sequence
+
+    - debug:
+        msg: intvar is string
+      when: intvar is string
+
+    - debug:
+        msg: boolvar is string
+      when: boolvar is string
+

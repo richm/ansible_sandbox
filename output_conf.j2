@@ -4,4 +4,5 @@ this
         long
         output_conf
         with value {{ output_conf_var }}
+        this is a template value [{{ lookup('template','nested_template.j2') }}] here
 end

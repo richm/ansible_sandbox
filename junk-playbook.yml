@@ -2,6 +2,40 @@
 - name: set parameters for test
   hosts: localhost
   tasks:
+
+  - copy:
+      dest: /var/tmp/junk.txt
+      content: here
+      owner: 99999
+      group: 99999
+
+  - command: lsblk --tree --paths --json --output NAME,MOUNTPOINT
+    register: lsblk_out
+
+  - set_fact:
+      rootdev: |-
+        {% set dd = lsblk_out.stdout | from_json %}
+        {% set ns = namespace(founddev='') %}
+        {% for topitem in dd.blockdevices %}
+        {%   for item in topitem.children | d([]) recursive %}
+        {%     if item.mountpoint == '/' %}
+        {%       set ns.founddev = topitem.name %}
+        {%     elif 'children' in item %}
+        {%       set _ = loop(item.children) %}
+        {%     endif %}
+        {%   endfor %}
+        {% endfor %}
+        {{ ns.founddev }}
+
+  - name: junk
+    debug:
+      msg: rootdev is [{{ rootdev }}]
+
+  - set_fact:
+      someary: [foo, bar, baz]
+  - debug:
+      msg: someary {{ someary }}
+
   - debug:
       msg: path is {{ '/1/2/3/4/5/6/7/8' | dirname | dirname | dirname ~ '/rsyslog' }}
   - set_fact:

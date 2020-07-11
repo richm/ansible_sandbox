@@ -1,0 +1,45 @@
+---
+- name: set parameters for test
+  hosts: localhost
+  tasks:
+    - name: Define platform/version specific vars
+      include_vars: "{{ lookup('first_found', __rolename_setup_files) }}"
+      vars:
+        __rolename_setup_files:
+          files:
+            - "{{ ansible_distribution }}_{{ ansible_distribution_version }}.yml"
+            - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+            - "{{ ansible_distribution }}.yml"
+            - "{{ ansible_os_family }}.yml"
+          paths:
+            - vars
+    - name: Perform platform/version specific tasks
+      include_tasks: "{{ lookup('first_found', __rolename_setup_files) }}"
+      vars:
+        __rolename_setup_files:
+          files:
+            - "{{ ansible_distribution }}_{{ ansible_distribution_version }}.yml"
+            - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+            - "{{ ansible_distribution }}.yml"
+            - "{{ ansible_os_family }}.yml"
+          paths:
+            - tasks/setup
+
+    - name: set vars files
+      set_fact:
+        __rolename_vars_file_list:
+          - "{{ ansible_facts['os_family'] }}.yml"
+          - "{{ ansible_facts['distribution'] }}.yml"
+          - "{{ ansible_distribution }}_{{ ansible_distribution_version }}.yml"
+          - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+
+    - name: loop with vars
+      include_vars: "{{ __rolename_vars_file }}"
+      loop: "{{ __rolename_vars_file_list | unique | list }}"
+      vars:
+        __rolename_vars_file: "vars/{{ item }}"
+      when: __rolename_vars_file is file
+
+    - name: check
+      debug:
+        msg: loop var {{ __rolename_vars_file | d('not defined') }}
