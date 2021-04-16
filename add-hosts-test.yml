@@ -1,0 +1,11 @@
+---
+- name: add hosts test
+  hosts: all
+  tasks:
+    - set_fact:
+        vpn_connections:
+          - type: psk
+            hosts:
+              hosta:
+              hostb:
+

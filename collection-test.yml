@@ -1,0 +1,12 @@
+- hosts: localhost
+  tasks:
+    - name: try github long
+      community.general.source_control.github.github_issue:
+        repo: ci-testing
+        organization: linux-system-roles
+        issue: 2
+    - name: try github long
+      community.general.github_issue:
+        repo: ci-testing
+        organization: linux-system-roles
+        issue: 2

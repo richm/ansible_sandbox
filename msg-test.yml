@@ -1,0 +1,13 @@
+- hosts: localhost
+  tasks:
+    - debug:
+        msg: >-
+          input(type="imfile" file="log_path"
+           tag="some tag")
+          {{ lookup("template", "msg-test.j2") }}
+          more text
+          one more
+      register: __dbg_changed
+    - debug:
+        msg: changed
+      when: __dbg_changed is changed

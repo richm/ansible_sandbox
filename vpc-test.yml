@@ -1,0 +1,16 @@
+- hosts: localhost
+  vars:
+    result:
+      vpc:
+        cidr_block_association_set:
+          - id: block1
+            cidr_block: 192.168.122.0/24
+            cidr_block_state:
+              state: present
+          - id: block2
+            cidr_block: 192.168.123.0/24
+            cidr_block_state:
+              state: disabled
+  tasks:
+    - debug:
+        msg: blocks {{ result.vpc.cidr_block_association_set | map(attribute="cidr_block") | list }}

@@ -1,0 +1,29 @@
+---
+- name: test
+  hosts: localhost
+  vars:
+    foo:
+      bar:
+        baz: true
+        biff: false
+  tasks:
+    - name: task
+      command: ls
+      register: __register_task
+    - name: task2
+      command: ls
+      register: __register2_task
+    - set_fact:
+        boolvar: |
+          {{ (__register_task is defined and __register_task is changed) or
+             (__register2_task is defined and __register2_task is changed) }}
+    - debug:
+        msg: boolvar {{ boolvar }} as bool {{ boolvar | bool }}
+      when: boolvar | bool
+        
+    - debug:
+        msg: here
+      when: foo.bar.baz
+    - debug:
+        msg: there
+      when: foo.bar.biff

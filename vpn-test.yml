@@ -1,0 +1,47 @@
+---
+- name: set parameters for test
+  hosts: localhost
+  tasks:
+    - set_fact:
+        vpn_connections:
+          - type: psk
+            hosts:
+              hosta:
+              hostb:
+          - type: another
+            hosts:
+              hosta:
+              hostb:
+            mybool: true
+          - type: another
+            hosts:
+              hosta:
+              hostb:
+            mybool: false
+
+    - name: show connections
+      debug:
+        msg: conns {{ vpn_connections | to_nice_json }}
+
+    - name: add psk to each tunnel
+      set_fact:
+        vpn_connections: |
+          {% for tunnel in vpn_connections | selectattr("type", "match", "^psk$") %}
+          {%   if "psk" not in tunnel %}
+          {%     set _ = tunnel.__setitem__("psk", "need to create psk") %}
+          {%   endif %}
+          {% endfor %}
+          {{ vpn_connections }}
+        a: "{{ vpn_connections | selectattr('mybool', 'defined') | list }}"
+        b: "{{ vpn_connections | selectattr('mybool', 'defined') | selectattr('mybool') | list }}"
+        c: "{{ vpn_connections | selectattr('mybool', 'defined') | rejectattr('mybool') | list }}"
+
+    - name: show connections again
+      debug:
+        msg: conns {{ vpn_connections | to_nice_json }} hostvars {{ hostvars['localhost'] | to_nice_json }}
+
+    - name: test search
+      vars:
+        main_hostname: "mainhost"
+      debug:
+        msg: item 1 {{ 'left=' + main_hostname }} 2 {{ 'the left=mainhost' is not search('left=' + main_hostname) }} 3 {{ search('left=' + main_hostname) }}

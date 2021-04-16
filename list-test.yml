@@ -1,0 +1,13 @@
+---
+- name: list test
+  hosts: localhost
+  tasks:
+    - set_fact:
+        value:
+          key1:
+            - key2: value2
+              "@key": atvalue1
+            - key5: value5
+              "@key": atvalue2
+    - debug:
+        msg: value4 is {{ value.key1 | map(attribute='@key')|list }}

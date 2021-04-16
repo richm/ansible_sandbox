@@ -1,0 +1,71 @@
+- hosts: localhost
+  tasks:
+    - vars:
+        roletoinclude: kernel_settings
+      block:
+        - name: make temp dir for caller role
+          tempfile:
+            state: directory
+            suffix: lsr
+          register: lsr_role_parent
+        - name: set caller role vars dir
+          set_fact:
+            lsr_role_dir: "{{ lsr_role_parent.path }}/roles/caller"
+        - name: make role dirs
+          file:
+            path: "{{ lsr_role_dir }}/{{ item }}"
+            state: directory
+          loop:
+            - vars
+            - tasks
+        - name: create task file in the caller role that includes the parent role
+          delegate_to: localhost
+          copy:
+            dest: "{{ lsr_role_dir }}/tasks/main.yml"
+            content: |
+              # tasks file for caller
+              - include_role:
+                  name: "{{ roletoinclude }}"
+              - assert:
+                  that: not __caller_override
+        - name: create var file in caller that can override the one in called role
+          delegate_to: localhost
+          copy:
+            content: "__caller_override: true"
+            dest: "{{ lsr_role_dir }}/vars/{{ item }}.yml"
+          loop: "{{ varfiles | unique }}"
+          vars:
+            facts: "{{ ansible_facts }}"
+            versions:
+              - "{{ facts['distribution_version'] }}"
+              - "{{ facts['distribution_major_version'] }}"
+            separators: [ "-", "_" ]
+            varfiles: "{{ [facts['distribution']] | product(separators) |
+              map('join') | product(versions) | map('join') | list +
+              [facts['distribution'], facts['os_family']] }}"
+        - name: get paths
+          debug:
+            msg: ansible_search_path {{ ansible_search_path }} config role path {{ lookup('config', 'DEFAULT_ROLES_PATH') }} env role path {{ lookup('env', 'ANSIBLE_ROLES_PATH') }}
+        - name: look for role
+          set_fact:
+            found_role: "{{ lookup('first_found', ffparams) }}"
+          vars:
+            ffparams:
+              files: "{{ roletoinclude }}"
+              paths: "{{ lookup('config', 'DEFAULT_ROLES_PATH') }}"
+              skip: true
+        - name: found role
+          debug:
+            msg: found_role {{ found_role }}
+          when: found_role | d([])
+        - include_role:
+            name: caller
+          ignore_errors: yes
+          register: role_result
+        - debug:
+            msg: role_result {{ role_result }}
+      always:
+        - name: remove tmpdir
+          file:
+            state: absent
+            path: "{{ lsr_role_parent.path }}"

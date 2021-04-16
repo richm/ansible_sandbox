@@ -1,0 +1,15 @@
+---
+- name: ternary test
+  hosts: localhost
+  tasks:
+    - set_fact:
+        tls: false
+        use_cert: false
+    - debug:
+        msg: |
+          {% if (tls is defined) | ternary(tls, use_cert | d(true)) %}
+          condition is true
+          {% else %}
+          condition is false
+          {% endif %}
+

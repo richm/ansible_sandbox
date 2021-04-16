@@ -1,0 +1,25 @@
+---
+- name: test
+  hosts: localhost
+  vars:
+    vert: |
+      vert
+    vertdash: |-
+      vertdash
+    gt: >
+      gt
+    gtdash: >-
+      gtdash
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:
+      bbbbbbbbbbbbbb: "1"
+      cccccccccccccc: "1"
+  tasks:
+    - name: copy test
+      debug:
+        msg: vert {{ vert }} vertdash {{ vertdash }} gt {{ gt }} gtdash {{ gtdash }}
+    - debug:
+        msg: here
+      when:
+        - >-
+          aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.bbbbbbbbbbbbbb | int ==
+          aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.cccccccccccccc | int

@@ -1,0 +1,21 @@
+---
+- name: test
+  hosts: localhost
+  tasks:
+    - set_fact:
+        __test_harness_dockerfile: /home/rmeggins/linux-system-roles/test-harness/Dockerfile
+        __test_harness_dockerfile_from: "{{ test_harness_citool_dockerfile_from }}"
+        __test_harness_extra: "{{ test_harness_citool_dockerfile_extra }}"
+        __test_harness_post:
+          - 'RUN a'
+          - 'RUN b'
+          - 'RUN c'
+        __th: true
+    - debug:
+        msg: |
+          {{ lookup('file', __test_harness_dockerfile) |
+             regex_replace('^FROM .*\n', 'FROM ' ~ __test_harness_dockerfile_from) |
+             replace('#EXTRAPRETESTER', __test_harness_extra) |
+             replace('#EXTRAPOST', __test_harness_post|join("
+          "))
+          }}

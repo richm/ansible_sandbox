@@ -1,0 +1,11 @@
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - stat:
+        path: stat-test.yml
+      register: __exists
+    - stat:
+        path: nosuchfile
+      register: __noexists
+    - debug:
+        msg: exist mode {{ __exists.stat.mode | d('0777') }} no {{ __noexists.stat.mode | d('0777') }}

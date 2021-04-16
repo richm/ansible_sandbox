@@ -1,0 +1,43 @@
+---
+- name: test nested blocks
+  hosts: localhost
+  tasks:
+    - block:
+        - name: first outer level task
+          debug:
+            msg: first outer level task
+        - block:
+            - name: first inner level task
+              debug:
+                msg: first inner level task
+            - name: inner task that fails
+              fail:
+                msg: inner task that fails
+            - name: inner task that should never execute
+              debug:
+                msg: inner task that should never execute
+          rescue:
+            - name: inner block rescue task
+              debug:
+                msg: inner block rescue task ansible_failed_result is {{ ansible_failed_result | d("undefined") | to_nice_json }}
+            - name: re-raise error
+              fail:
+                msg: "{{ ansible_failed_result }}"
+          always:
+            - name: first inner block always task
+              debug:
+                msg: first inner block always task ansible_failed_result is {{ ansible_failed_result | d("undefined") | to_nice_json }}
+        - block:
+            - name: second block inner level task
+              debug:
+                msg: second block inner level task
+        - name: second outer level task
+          debug:
+            msg: second outer level task
+      rescue:
+        - name: outer block rescue task
+          debug:
+            msg: outer block rescue task ansible_failed_result is {{ ansible_failed_result | d("undefined") | to_nice_json }}
+        - name: check for error message
+          assert:
+            that: ansible_failed_result.msg == "inner task that fails"

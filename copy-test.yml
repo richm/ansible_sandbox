@@ -1,0 +1,8 @@
+---
+- name: test
+  hosts: localhost
+  tasks:
+    - name: copy test
+      copy:
+        src: junk.txt
+        dest: junk-copy.txt

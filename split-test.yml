@@ -1,0 +1,8 @@
+---
+- name: split test
+  hosts: localhost
+  vars:
+    hostname: "vm-10-0-77-121.hosted.upshift.rdu2.redhat.com"
+  tasks:
+    - debug:
+        msg: hostname {{ hostname.split('.')[1:] | join('.') }}

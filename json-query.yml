@@ -1,0 +1,22 @@
+- name: testing
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    myhosts:
+    - collection:
+      - name: host1
+        ip: 10.1.2.3
+      - name: host2
+        ip: 10.4.5.6
+    macs:
+    - host: host1
+      mac: "11:22:33:44:55:66"
+    - host: host2
+      mac: "66:55:44:33:22:11"
+
+
+  tasks:
+  - name: Combine
+    debug:
+      msg: "{{ myhosts | json_query('[*].collection') }}"

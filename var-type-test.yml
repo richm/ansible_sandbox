@@ -8,7 +8,11 @@
           - this
           - is
           - a
-          - list
+          - >-
+            a
+            wrapped
+            string
+            value
         dictvar:
           this: is
           a: dict
@@ -59,3 +63,5 @@
         msg: boolvar is string
       when: boolvar is string
 
+    - debug:
+        msg: listvar {{ listvar | to_nice_json }}

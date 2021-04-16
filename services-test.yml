@@ -1,0 +1,42 @@
+---
+- name: test
+  hosts: localhost
+  tasks:
+    - name: service facts
+      service_facts:
+
+    - debug:
+        msg: |
+          service_facts {{ ansible_facts.services | to_nice_json }}
+          again {{ ansible_facts.services | dict2items | selectattr('key', 'match', '^systemd-cryptsetup@') | map(attribute='value') | map(attribute='name') | list }}
+
+    #again {{ ansible_facts.services | dict2items | selectattr('key', 'match', '^systemd-cryptsetup@') | map(attribute='value') | map(attribute='name') | list }}
+
+    # - name: Set variable with services List for RedHat 7 and above systems
+    #   command: systemctl list-unit-files --no-legend *.service  # noqa 303
+    #   register: __timesync_register_services
+    #   check_mode: no
+    #   changed_when: false
+
+    # - set_fact:
+    #     timesync_services: |
+    #       {{ __timesync_register_services.stdout_lines |
+    #          map('regex_replace', '[.]service.*$', '') |
+    #          map('regex_replace', '@$', '') |
+    #          unique |
+    #          list }}
+    # - debug:
+    #     msg: timesync_services {{ timesync_services }}
+
+    # - set_fact:
+    #     __timesync_register_services:
+    #       - 'a 	x y z'
+    #       - 'b		   x y z'
+    #       - 'c	x y z'
+    #       - 'd x y z'
+    # - debug:
+    #     msg: |
+    #       {{ __timesync_register_services |
+    #         map('regex_replace', '[ \t].*$', '') |
+    #         unique |
+    #         list }}

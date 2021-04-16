@@ -1,0 +1,2 @@
+- debug:
+    msg: in var-scoping-include name {{ name }} val {{ val }}

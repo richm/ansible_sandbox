@@ -1,0 +1,13 @@
+---
+- name: selectattr attr
+  hosts: localhost
+  vars:
+    bpftrace_users:
+      - { user: metrics, sasluser: metrics, saslpassword: admin }
+      - { user: foo }
+      - { sasluser: bar }
+  tasks:
+    - set_fact:
+        bpftrace_usernames: "{{ bpftrace_users | selectattr('user', 'defined') | map(attribute='user') | join(',') }}"
+    - debug:
+        msg: bpftrace_usernames {{ bpftrace_usernames | to_nice_json }}

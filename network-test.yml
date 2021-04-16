@@ -1,0 +1,24 @@
+- hosts: localhost
+  vars:
+    # network_connections:
+    #   - name: A
+    #     type: wireless
+    #   - name: B
+    #     type: wired
+    #   - name: C
+    #     type: wireless
+    #   - name: D
+    #     type: other
+    network_connections:
+      - name: B
+        type: wired
+      - name: D
+        type: other
+  tasks:
+    - set_fact:
+        __network_wireless_connections_defined: "{{
+          network_connections | selectattr('type', 'match', '^wireless$') | list | length > 0
+        }}"
+    - debug:
+        msg: __network_wireless_connections_defined true {{ __network_wireless_connections_defined }}
+      when: __network_wireless_connections_defined | bool

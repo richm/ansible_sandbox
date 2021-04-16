@@ -1,0 +1,27 @@
+---
+- name: dict test
+  hosts: localhost
+  tasks:
+    - set_fact:
+        jsonform: {"state":"absent"}
+        pyform: {'state':'absent'}
+        yamlform:
+          state: absent
+    - debug:
+        msg: success - jsonform equals yamlform
+      when: jsonform == yamlform
+    - debug:
+        msg: success - pyform equals yamlform
+      when: pyform == yamlform
+    - debug:
+        msg: success - pyform equals yamlform
+      when: pyform == jsonform
+    - debug:
+        msg: success - jsonform equals literal dict in quotes
+      when: "jsonform == {'state':'absent'}"
+    - debug:
+        msg: success - pyform equals literal dict in quotes
+      when: "pyform == {'state':'absent'}"
+    - debug:
+        msg: success - yamlform equals literal dict in quotes
+      when: "yamlform == {'state':'absent'}"

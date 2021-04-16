@@ -2,6 +2,16 @@
   hosts: localhost
   tasks:
     - set_fact:
+        __sap_preconfigure_packagegroups:
+          - "@group@a@"
+          - "@group@b@"
+          - "groupc"
+          - "@group@e@"
+        stdout_lines:
+          - groupa
+          - groupb
+          - groupc
+          - groupc
         mypkgs:
           - [ 'kernel' , '5.6.13-201.fc31' ]
           - [ 'glibc' , '2.30-12.fc31' ]
@@ -14,6 +24,9 @@
           - gamma
           - epsilon
           - phi
+    - assert:
+        that: item in stdout_lines
+      loop: "{{ __sap_preconfigure_packagegroups | map('replace', '@', '') | list }}"
 
     - name: list1
       debug:

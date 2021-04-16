@@ -1,0 +1,27 @@
+- hosts: localhost
+  tasks:
+    - set_fact:
+        tunnel:
+          hosts:
+            host1:
+              hostname: hostname1
+            host2:
+            host3:
+        an_hosts:
+          host1:
+          host2:
+            ansible_host: an_host2
+          host3:
+    - debug:
+        msg: |
+          {% for item in tunnel.hosts %}
+          {%   set otherhost = tunnel.hosts[item].hostname | d(an_hosts[item].ansible_host | d(item)) %}
+          {{   otherhost }}
+          {% endfor %}
+
+
+
+
+
+# {%   elif ansible_host is defined %}
+# {%     set otherhost = ansible_host %}

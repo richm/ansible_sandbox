@@ -1,0 +1,29 @@
+---
+- name: set parameters for test
+  hosts: localhost
+  tasks:
+    - set_fact:
+        mylist:
+          - name: aname
+            val: aval
+          - name: bname
+            val: bval
+    - include_tasks: var-scoping-include.yml
+      loop: "{{ mylist }}"
+
+    - debug:
+        msg: name is {{ name | d('undefined') }} val is {{ val | d('undefined') }}
+
+    - set_fact:
+        name: unset
+        val: unset
+
+    - include_tasks: var-scoping-include-2.yml
+      vars:
+        name: "{{ item.name }}"
+        val: "{{ item.val }}"
+      loop: "{{ mylist }}"
+
+    - debug:
+        msg: name is {{ name | d('undefined') }} val is {{ val | d('undefined') }}
+

@@ -1,0 +1,24 @@
+---
+- name: test
+  hosts: localhost
+  tasks:
+    - block:
+        - set_fact:
+            __expected_error: "Error: ['bogus_basic_input'] includes undefined logging_inputs item."
+            __results: "Error: ['bogus_basic_input'] includes undefined logging_inputs item."
+        - fail:
+            msg: "{{ __results }}"
+          loop:
+            - 1
+            - 2
+            - 3
+          when: item == 3
+      rescue:
+        - debug:
+            msg: Caught an expected error - {{ ansible_failed_result|to_nice_json }}
+        # failure not in a loop
+        # - assert:
+        #     that: ansible_failed_result.msg == __expected_error
+        # failure in a loop
+        - assert:
+            that: ansible_failed_result.results.2.msg == __expected_error

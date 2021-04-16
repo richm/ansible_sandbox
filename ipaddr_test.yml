@@ -1,0 +1,29 @@
+- hosts: localhost
+  gather_facts: false
+  vars:
+#    cidr1: "999.999.999.999/32"
+    cidr1: "169.255.0.0/16"
+    cidr2: "192.168.122.0/24"
+    cidr3: "172.16.0.0/18"
+    host1: "192.168.122.0"
+    host2: myhostname
+
+  tasks:
+    - debug:
+        msg: |
+          host1 {{ host1 | ipaddr | ternary('','@') }}{{ host1 }}
+          host2 {{ host2 | ipaddr | ternary('','@') }}{{ host2 }}
+    - debug:
+        msg: |
+          subnet1 {{ cidr1 | ipaddr('subnet') }}
+          subnet2 {{ cidr2 | ipaddr('subnet') }}
+          subnet3 {{ cidr3 | ipaddr('subnet') }}
+          sub {{ '192.168.122.100' | ipaddr('subnet') }}
+          addr {{ '192.168.122.100' | ipaddr('address') }}
+          host {{ '192.168.122.100' | ipaddr('host') }}
+          net {{ '192.168.122.100' | ipaddr('net') | ipaddr('bool') }}
+          ip1 {{ '192.168.122.100' | ipaddr(cidr1) | bool or 'junk' }}
+          ip2 {{ '192.168.122.100' | ipaddr(cidr2) | bool or 'junk' }}
+          ip3 {{ '192.168.122.100' | ipaddr(cidr3) | bool or 'junk' }}
+          ip4 {{ '192.168.122.100' | ipaddr('192.168.0.0/16') | string }}
+          ip5 {{ '192.168.122.100' | ipaddr('192.0.0.0/8') | string }}

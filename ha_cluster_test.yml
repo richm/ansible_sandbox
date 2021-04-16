@@ -1,0 +1,21 @@
+- hosts: localhost
+  vars:
+    nodenames: [node1, node2, node3]
+  tasks:
+    - name: add nodes
+      add_host:
+        name: "{{ item }}"
+        foo: bar
+        ha_cluster:
+          node_name: "{{ item ~ '-ha' }}"
+      when: item != 'node2'
+      loop: "{{ nodenames }}"
+
+    - name: add node2
+      add_host:
+        name: node2
+        foo: bar
+
+    - debug:
+        msg: ansible_play_hosts_all {{ ansible_play_hosts_all }} hostvars {{ ansible_play_hosts_all | map('extract', hostvars, ['ha_cluster', 'node_name']) | map('default', inventory_hostname) | list }}
+#        msg: ansible_play_hosts_all {{ ansible_play_hosts_all }} hostvars {{ ansible_play_hosts_all | map('extract', hostvars, ['ha_cluster', 'hode_name']) | list }}

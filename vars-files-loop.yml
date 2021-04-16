@@ -1,0 +1,17 @@
+---
+- name: test
+  hosts: localhost
+  tasks:
+    - set_fact:
+        facts: "{{ ansible_facts }}"
+        separators: [ "-", "_" ]
+        versions: 
+          - "{{ ansible_facts['distribution_version'] }}"
+          - "{{ ansible_facts['distribution_major_version'] }}"
+
+    - set_fact:
+        varfiles: "{{ [facts['distribution']] | product(separators) |
+          map('join') | product(versions|unique) | map('join') | list +
+          [facts['distribution'], facts['os_family']] }}"
+    - debug:
+        msg: varfiles {{ varfiles | to_nice_json }}

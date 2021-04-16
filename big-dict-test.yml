@@ -1,0 +1,37 @@
+---
+- name: big dict test
+  hosts: localhost
+  vars:
+    DISTROS:
+      8.3:
+        RHSM_PKGS_URL: "https://access.redhat.com/node/2360841/40/0/19124201"
+        PKGS:
+          - redhat-release-8.3-1.0.el8.x86_64.rpm
+          - redhat-release-eula-8.3-1.0.el8.x86_64.rpm
+          - subscription-manager-1.27.16-1.el8.x86_64.rpm
+          - subscription-manager-rhsm-certificates-1.27.16-1.el8.x86_64.rpm
+      7.9:
+        RHSM_PKGS_URL: "https://access.redhat.com/something"
+        PKGS:
+          - redhat-release-7.9
+          - redhat-release-eula-7.9
+      33:
+        RHSM_PKGS_URL: "https://access.redhat.com/other"
+        PKGS:
+          - redhat-release-33
+          - redhat-release-eula-33
+    my_release: 8.3
+  tasks:
+    - debug:
+        msg: |
+          {% for distro,thing in DISTROS.items() %}
+          {{ distro|type_debug }} {{ thing }}
+          {% endfor %}
+          {{ ansible_distribution_version }} is type {{ ansible_distribution_version | type_debug }}
+    - debug:
+        msg: it is {{ DISTROS[my_release]['RHSM_PKGS_URL'] }}
+
+    - name: Download Red Hat Subscription Manager archive file
+      get_url:
+        url: "{{ DISTROS[ansible_distribution_version|float]['RHSM_PKGS_URL'] }}"
+        dest: "junk.thing"

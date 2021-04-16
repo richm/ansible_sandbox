@@ -1,0 +1,48 @@
+- hosts: localhost
+  gather_facts: false
+  vars:
+    mypassword: "this is a <' bad '> password!"
+    foo:
+      stdout: "adfasdf"
+  tasks:
+    - name: debug
+      vars:
+        __ipaddress: >-
+          {{ item.ip_address_stdout | regex_search('[^: ]*$') }}
+        __tcpport: >-
+          {{ item.tcp_port_stdout | regex_search('[^: ]*$') }}
+        __s_arg: >-
+          {{ (__ipaddress or __tcpport) | ternary('-S', '') }}
+        __ipaddress_arg: >-
+          {{ __ipaddress if __ipaddress
+            else 'localhost' if __tcpport
+            else '' }}
+      command: >-
+        echo /opt/mssql-tools/bin/sqlcmd
+        {{ __s_arg }}
+        {{ __ipaddress_arg }}{{ ',' ~ __tcpport
+        if __tcpport else '' }}
+        -U sa -P {{ mypassword | quote }} -Q 'SELECT @@VERSION'
+      loop:
+        - ip_address_stdout: ""
+          tcp_port_stdout: ""
+        - ip_address_stdout: "ipaddress : 127.0.0.1"
+          tcp_port_stdout: ""
+        - ip_address_stdout: ""
+          tcp_port_stdout: "tcpport : 4999"
+        - ip_address_stdout: "ipaddress : 127.0.0.1"
+          tcp_port_stdout: "tcpport : 4999"
+
+    - debug:
+        msg: foo
+      when: foo.stdout | d('')
+
+    - debug:
+        msg: here {{ __stdout.split(" ") }}
+      vars:
+        __stdout: "here there kernel-settings mssql"
+
+    - debug:
+        msg: ipaddr {{ __stdout | ipaddr }}
+      vars:
+        __stdout: "ipaddress : 1.2.3.4"

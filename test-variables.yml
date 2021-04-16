@@ -5,6 +5,27 @@
   - set_fact:
       kernel_settings_systemd_cpu_affinity: null
       kernel_settings_systemd_cpu_affinity_state: null
+      k8s:
+        resources:
+          - spec:
+              template:
+                spec:
+                  securityContext: {}
+      # metrics_query_service: true
+      # metrics_graph_service: true
+
+  - debug:
+      msg: value {{ lookup('env', 'BEAKERLIB') }} as bool {{ lookup('env', 'BEAKERLIB') is eq "" }}
+
+  - set_fact:
+      pcp_rest_api: "{{ metrics_query_service|d(false)|bool or metrics_graph_service|d(false)|bool }}"
+
+  - debug:
+      msg: here
+    when:
+      - "'securityContext' not in k8s.resources.0.spec.template.spec or
+        'runAsUser' not in k8s.resources.0.spec.template.spec.securityContext"
+  - fail:
 
   - debug:
       msg: "{{ 'cpu_affinity'

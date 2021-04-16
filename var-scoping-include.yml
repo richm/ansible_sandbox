@@ -1,0 +1,6 @@
+- set_fact:
+    name: "{{ item.name }}"
+    val: "{{ item.val }}"
+
+- debug:
+    msg: in var-scoping-include name {{ name }} val {{ val }}

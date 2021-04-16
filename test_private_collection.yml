@@ -1,0 +1,19 @@
+- hosts: localhost
+  roles:
+    - namespace.collection_name.parent_role
+
+- hosts: localhost
+  roles:
+    - namespace.collection_name.private_test
+
+- hosts: localhost
+  tasks:
+    - block:
+        - include_role:
+            name: namespace.collection_name.private_test_subrole
+        - fail:
+            msg: UNREACH
+      rescue:
+        - fail:
+            msg: should have failed
+          when: ansible_failed_result.msg.0 == "UNREACH"

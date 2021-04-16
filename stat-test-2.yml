@@ -1,0 +1,11 @@
+- hosts: localhost
+  tasks:
+    - name: Remove if there was one
+      tags:
+        - 'tests::cleanup'
+      file:
+        path: junk
+        state: absent
+      when:
+        - etc_sysconfig_network_stat is defined
+        - etc_sysconfig_network_stat.stat.exists

@@ -1,0 +1,11 @@
+---
+- name: test role var inclusion
+  hosts: localhost
+  tasks:
+    - debug:
+        msg: |
+          {% set foo = "1" %}
+          {% if true %}
+          {%   set foo = "2" %}
+          {% endif %}
+          {{ foo }}

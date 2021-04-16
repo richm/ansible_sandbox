@@ -1,0 +1,100 @@
+---
+- name: set parameters for test
+  hosts: localhost
+  tasks:
+    - name: set
+      set_fact:
+        collpaths: |
+          {{
+             (lookup("env","ANSIBLE_COLLECTIONS_PATH").split(":") +
+             lookup("env","ANSIBLE_COLLECTIONS_PATHS").split(":") +
+             lookup("config", "COLLECTIONS_PATHS")) |
+             select | list
+          }}
+    - debug:
+        msg: collpaths {{ collpaths }}
+    - name: get collection modules paths
+      shell: |
+        set -euo pipefail
+        for dir in {{ collpaths | join(" ") }}; do
+          for subdir in $dir/ansible_collections/*/*/plugins/modules; do
+            if [ -d "$subdir" ]; then
+              echo "$subdir"
+            fi
+          done
+        done
+      register: coll_modules
+    - name: get collection module_utils paths
+      shell: |
+        set -euo pipefail
+        for dir in {{ collpaths | join(" ") }}; do
+          for subdir in $dir/ansible_collections/*/*/plugins/module_utils; do
+            if [ -d "$subdir" ]; then
+              echo "$subdir"
+            fi
+          done
+        done
+      register: coll_module_utils
+    - debug:
+        msg: coll_modules {{ coll_modules.stdout_lines }} coll_module_utils {{ coll_module_utils.stdout_lines }}
+    - set_fact:
+        _coll: |
+          {% set ns = namespace(pth=[]) %}
+          {% set paths = lookup("env","ANSIBLE_COLLECTIONS_PATH").split(":") + lookup("env","ANSIBLE_COLLECTIONS_PATHS").split(":") + lookup("config", "COLLECTIONS_PATHS") %}
+          {% for colldir in paths %}
+          {%   if colldir %}
+          {%     set ns.pth = ns.pth + lookup("fileglob", colldir ~ "/ansible_collections/*/*/modules", wantlist=true) %}
+          {%   endif %}
+          {% endfor %}
+          {{ ns.pth }}
+
+    - debug:
+        msg: _coll is {{ _coll }}
+
+    - name: set lib search path
+      set_fact:
+        __lib_search_path: |
+            {{
+               (lookup("env", "ANSIBLE_LIBRARY").split(":") +
+               ["../library"] +
+               lookup("config", "DEFAULT_MODULE_PATH")) |
+               select | list + coll_modules.stdout_lines
+            }}
+    - name: set module_utils search path
+      set_fact:
+        __mod_utils_search_path: |
+            {{
+               (lookup("env", "ANSIBLE_MODULE_UTILS").split(":") +
+               ["../module_utils"] +
+               lookup("config", "DEFAULT_MODULE_UTILS_PATH")) |
+               select | list + coll_module_utils.stdout_lines
+            }}
+
+    - name: __lib_search_path
+      debug:
+        msg: __lib_search_path {{ __lib_search_path }}
+
+    - name: __mod_utils_search_path
+      debug:
+        msg: __mod_utils_search_path {{ __mod_utils_search_path }}
+
+    - name: find library file
+      set_fact:
+        __libfile: "{{ lookup('first_found', lib_params) }}"
+      vars:
+        lib_params:
+          files:
+            - network_connections.py
+          paths: "{{ __lib_search_path }}"
+
+    - name: find module_utils file
+      set_fact:
+        __modfile: "{{ lookup('first_found', lib_params) }}"
+      vars:
+        lib_params:
+          files:
+            - network_lsr
+          paths: "{{ __mod_utils_search_path }}"
+
+    - debug:
+        msg: __libfile {{ __libfile | realpath | dirname }} __modfile {{ __modfile | realpath | dirname }}
