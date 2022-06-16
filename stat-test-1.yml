@@ -1,4 +1,5 @@
 - hosts: localhost
+  gather_facts: false
   tasks:
     - name: Investigate /etc/sysconfig/network presence
       tags:
@@ -7,3 +8,10 @@
         path: junk
       register: etc_sysconfig_network_stat
       ignore_errors: yes
+
+    - command: ls nosuchfile
+      register: __testme
+      failed_when: false
+
+    - debug:
+        msg: here {{ __testme | to_nice_json }}

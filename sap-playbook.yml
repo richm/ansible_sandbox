@@ -1,6 +1,12 @@
 - name: junk
   hosts: localhost
+  gather_facts: false
+  vars:
+    aaasap_general_preconfigure_config_all: false
   tasks:
+    - debug:
+        msg: val {{ (sap_preconfigure_config_all|d(sap_general_preconfigure_config_all))|type_debug }}
+
     - set_fact:
         __sap_preconfigure_packagegroups:
           - "@group@a@"

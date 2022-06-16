@@ -1,14 +1,14 @@
 ---
 - name: changed test
   hosts: localhost
+  gather_facts: false
   tasks:
-    - debug:
-        msg: facts 1 {{ ansible_facts }}
-
     - command: ls
+      register: __ls_result
 
     - debug:
         msg: facts 2 {{ ansible_facts }}
+      when: not __ls_result is changed
  
     - command: ls
       changed_when: false

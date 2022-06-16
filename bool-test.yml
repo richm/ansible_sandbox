@@ -1,12 +1,48 @@
 ---
 - name: test
   hosts: localhost
+  gather_facts: false
   vars:
     foo:
       bar:
         baz: true
         biff: false
+    fraz: "true"
+    fripp: "false"
+    barg: { a: 1 }
+    abool: true
+    emptystring: ""
+    nonemptystring: nonemptystring
+    emptylist: []
+    nonemptylist: [here]
+    emptydict: {}
+    noneval: none
+    boollist:
+      - changed: false
+        name: 1
+      - changed: true
+        name: 2
+    testval: "{{ emptydict }}"
   tasks:
+    - debug:
+        msg: emptystring is {{ emptystring }} nonemptystring is {{ nonemptystring }}
+    - debug:
+        msg: should print here
+      when: not emptystring
+    - debug:
+        msg: should not print here
+      when: emptystring | bool
+    - debug:
+        msg: should print here
+      when: not not nonemptystring
+    - debug:
+        msg: should not print here
+      when: not nonemptystring
+    - set_fact:
+        anotherbool: >-
+          {{ abool }}
+    - debug:
+        msg: anotherbool is {{ anotherbool }} {{ anotherbool | type_debug }}
     - name: task
       command: ls
       register: __register_task
@@ -20,10 +56,34 @@
     - debug:
         msg: boolvar {{ boolvar }} as bool {{ boolvar | bool }}
       when: boolvar | bool
-        
+    - debug:
+        msg: compare {{ fraz }}
+      when:
+        - fraz == "true"
+        - not fripp | bool
     - debug:
         msg: here
       when: foo.bar.baz
     - debug:
         msg: there
       when: foo.bar.biff
+    - debug:
+        msg: fraz {{ fraz | bool }}
+      when: fraz | bool
+    - debug:
+        msg: fripp {{ fripp | bool }}
+      when: fripp | bool
+    - debug:
+        msg: barg {{ barg | bool }}
+      when: barg | bool
+    - debug:
+        msg: emptylist
+      when: emptylist | d([])
+    - debug:
+        msg: nonemptylist {{ nonemptylist | bool }}
+      when: nonemptylist | d([])
+    - debug:
+        msg: boollist {{ boollist | selectattr('changed') | list | to_nice_json }}
+    - debug:
+        msg: should print this
+      when: not testval | bool

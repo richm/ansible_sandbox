@@ -1,15 +1,47 @@
 ---
 - name: test
   hosts: localhost
+  gather_facts: false
+  vars:
+    __timesync_services:
+      - chronyd
+      - ntpd
+      - ntpdate
+      - phc2sys
+      - ptp4l
+      - sntp
+      - timemaster
+    __timesync_services_suffix: "{{ __timesync_services | map('replace', '$', '.service') }}"
   tasks:
     - name: service facts
       service_facts:
 
+    - set_fact:
+        __system_services_suffix: "{{ ansible_facts.services.keys() | intersect(__timesync_services_suffix) |
+            map('extract', ansible_facts.services) | selectattr('status', 'match', '^(enabled|disabled)$') }}"
+        __system_services_nosuffix: "{{ ansible_facts.services.keys() | intersect(__timesync_services) |
+            map('extract', ansible_facts.services) | selectattr('status', 'match', '^(enabled|disabled)$') }}"
+        __system_services: "{{ __system_services_suffix + __system_services_nosuffix }}"
+
+    - name: loopit
+      debug:
+        msg: |
+          name: {{ __item['name'] }}
+          state: {{ (__item['state'] == 'running') | ternary('restarted', 'stopped') }}
+          enabled: {{ __item['status'] == 'enabled' }}
+      loop: "{{ __timesync_services }}"
+      vars:
+        __sys_item: "{{ __system_services | selectattr('name', 'match', '^' ~ item ~ '$') }}"
+        __item: "{{ __sys_item[0] if __sys_item else {'name': item, 'state': 'stopped', 'status': 'disabled'} }}"
     - debug:
         msg: |
-          service_facts {{ ansible_facts.services | to_nice_json }}
+          service_facts {{ __system_services | to_nice_json }}
           again {{ ansible_facts.services | dict2items | selectattr('key', 'match', '^systemd-cryptsetup@') | map(attribute='value') | map(attribute='name') | list }}
-
+      vars:
+        __name: timemaster.service
+        __system_services: "{{ ansible_facts.services.keys() | intersect(__timesync_services.keys()) |
+            map('extract', ansible_facts.services) | selectattr('status', 'match', '^(enabled|disabled)$') }}"
+        
     #again {{ ansible_facts.services | dict2items | selectattr('key', 'match', '^systemd-cryptsetup@') | map(attribute='value') | map(attribute='name') | list }}
 
     # - name: Set variable with services List for RedHat 7 and above systems

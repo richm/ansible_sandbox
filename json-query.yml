@@ -14,9 +14,44 @@
       mac: "11:22:33:44:55:66"
     - host: host2
       mac: "66:55:44:33:22:11"
-
+    lvms:
+      pvs:
+        /dev/sda:
+          free_g: "1.00"
+          size_g: "10.00"
+          vg: "foo"
+        /dev/sdb:
+          free_g: "1.00"
+          size_g: "10.00"
+          vg: "bar"
+    storage_test_pool:
+      name: foo
+    foo:
+      - name: host1
+      - name: host2
+      - name: host3
+    myname:
+      name: myname
+      tunnel:
+        name: myname2
 
   tasks:
+  - debug:
+      msg: names {{ myname | json_query('name') }}
+  - debug:
+      msg: select {{ foo | selectattr('name', 'match', '^host$') | list }}
   - name: Combine
     debug:
       msg: "{{ myhosts | json_query('[*].collection') }}"
+  - name: foo
+    debug:
+      msg: foo {{ lvms.pvs | dict2items(key_name='path', value_name='info') |
+                  selectattr('info.vg', 'match', '^' ~ storage_test_pool.name ~ '$') | map(attribute='path') | list }}
+  # - service_facts:
+  # - set_fact:
+  #     using_js: "{{ ansible_facts.services|to_json|from_json|json_query('*.name')|json_query('[?starts_with(@, `\"systemd-cryptsetup@\"`)]') }}"
+  #     using_sa: "{{ ansible_facts.services.values() | selectattr('name', 'defined') | map(attribute='name') | select('match', '^systemd-cryptsetup@') | list }}"
+  # - debug:
+  #     msg: true
+  #   when: using_js == using_sa
+

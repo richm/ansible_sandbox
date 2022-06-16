@@ -37,7 +37,16 @@
       # where the loop variable is called 'input' and the value is
       # one of the 'logging_inputs'
       input_typeB: '($syslogtag == "{{ input.name }}")'
+    server_host:
+      - logging-es0
+      - logging-es1
   tasks:
+    - debug:
+        msg: |
+          {% if server_host is sequence %}
+          bad server={{ server_host }}
+          good server=[{{ server_host | map('to_json') | join(', ') }}]
+          {% endif %}
     - set_fact:
         type0_outputs: "{{ logging_outputs | selectattr('foo','defined') | selectattr('foo','==','output_type0') | selectattr('bar','defined') | list }}"
     - debug:

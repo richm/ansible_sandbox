@@ -1,5 +1,6 @@
 ---
 - name: changed test
+  gather_facts: false
   hosts: localhost
   tasks:
     - set_fact:
@@ -18,6 +19,7 @@
           a: dict
         intvar: 1
         boolvar: true
+        nonevar: none
 
     - debug:
         msg: strvar is string
@@ -65,3 +67,6 @@
 
     - debug:
         msg: listvar {{ listvar | to_nice_json }}
+
+    - debug:
+        msg: nonevar {{ nonevar }} type {{ nonevar | type_debug }}

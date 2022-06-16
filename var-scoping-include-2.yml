@@ -1,2 +1,8 @@
 - debug:
     msg: in var-scoping-include name {{ name }} val {{ val }}
+
+- block:
+    - command: ls
+      register: __scope_output
+    - debug:
+        msg: output is {{ __scope_output | to_nice_json }}

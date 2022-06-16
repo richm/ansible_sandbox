@@ -21,7 +21,7 @@
 
     - name: show connections
       debug:
-        msg: conns {{ vpn_connections | to_nice_json }}
+        msg: conns {{ vpn_connections | to_nice_json }} oth {{ vpn_connections | selectattr("type", "match", "other") | list }}
 
     - name: add psk to each tunnel
       set_fact:
@@ -38,7 +38,7 @@
 
     - name: show connections again
       debug:
-        msg: conns {{ vpn_connections | to_nice_json }} hostvars {{ hostvars['localhost'] | to_nice_json }}
+        msg: conns {{ vpn_connections | to_nice_json }} hostvars {{ hostvars['localhost']['ansible_distribution'] | to_nice_json }}
 
     - name: test search
       vars:

@@ -25,5 +25,5 @@
       loop: "{{ mylist }}"
 
     - debug:
-        msg: name is {{ name | d('undefined') }} val is {{ val | d('undefined') }}
+        msg: name is {{ name | d('undefined') }} val is {{ val | d('undefined') }} __scope_output {{ __scope_output | d('undefined') }}
 

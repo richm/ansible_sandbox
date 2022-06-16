@@ -1,6 +1,7 @@
 ---
 - name: test
   hosts: localhost
+  gather_facts: false
   tasks:
     - block:
         - set_fact:
@@ -22,3 +23,8 @@
         # failure in a loop
         - assert:
             that: ansible_failed_result.results.2.msg == __expected_error
+        - fail:
+            msg: force fail
+      always:
+        - debug:
+            msg: always

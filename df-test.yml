@@ -4,8 +4,8 @@
   tasks:
     - set_fact:
         __test_harness_dockerfile: /home/rmeggins/linux-system-roles/test-harness/Dockerfile
-        __test_harness_dockerfile_from: "{{ test_harness_citool_dockerfile_from }}"
-        __test_harness_extra: "{{ test_harness_citool_dockerfile_extra }}"
+        __test_harness_dockerfile_from: FROM
+        __test_harness_extra: EXTRA
         __test_harness_post:
           - 'RUN a'
           - 'RUN b'
